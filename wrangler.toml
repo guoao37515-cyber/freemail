@@ -15,11 +15,11 @@ database_id = "7f5b9cba-513f-4b7b-ae91-dbd741edfaad" # 你的database_id
 # FORWARD_RULES="[{"prefix":"vip","email":"a@example.com"},{"prefix":"*","email":"example@qq.com"}]"
 ADMIN_NAME="admin"
 ADMIN_PASSWORD="zhang123456"
-GUEST_PASSWORD="guest"
-JWT_TOKEN="fjiwaiv23164s4fdsfs6df6wfdx"
-JWT_TOKENGUEST_PASSWORD="dfsfsfxzcv"
+GUEST_PASSWORD="guestguest"
+JWT_TOKEN="zhang123456"
+JWT_TOKENGUEST_PASSWORD="zhang123456"
 SESSION_EXPIRE_DAYS="365"
-MAIL_DOMAIN="sunday9528.com"
+MAIL_DOMAIN="sunday9527.com,sunday9527.shop,sunday95289528.eu.cc,sunday9527.eu.cc,sunday9528.eu.cc"
 RESEND_API_KEY=""
 
 
