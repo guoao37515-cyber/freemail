@@ -129,6 +129,54 @@ export async function handleMailboxAdminApi(request, db, url, path, options) {
     }
   }
 
+  // 批量删除邮箱
+  if (path === '/api/mailboxes/batch-delete' && request.method === 'POST') {
+    if (isMock) return errorResponse('演示模式不可删除', 403);
+    if (!isStrictAdmin(request, options)) return errorResponse('Forbidden', 403);
+    try {
+      const body = await request.json();
+      const addresses = body.addresses || [];
+
+      if (!Array.isArray(addresses) || addresses.length === 0) {
+        return errorResponse('缺少 addresses 参数或地址列表为空', 400);
+      }
+      if (addresses.length > 100) {
+        return errorResponse('单次最多删除100个邮箱', 400);
+      }
+
+      const normalized = addresses.map(a => String(a || '').trim().toLowerCase()).filter(Boolean);
+      const placeholders = normalized.map(() => '?').join(',');
+
+      const mbRes = await db.prepare(
+        `SELECT id, address FROM mailboxes WHERE address IN (${placeholders})`
+      ).bind(...normalized).all();
+
+      const rows = mbRes.results || [];
+      if (rows.length === 0) {
+        return Response.json({ success: true, deleted: 0 });
+      }
+
+      const ids = rows.map(r => r.id);
+      const idPlaceholders = ids.map(() => '?').join(',');
+
+      try { await db.exec('BEGIN'); } catch (_) {}
+      await db.prepare(`DELETE FROM messages WHERE mailbox_id IN (${idPlaceholders})`).bind(...ids).run();
+      const deleteResult = await db.prepare(`DELETE FROM mailboxes WHERE id IN (${idPlaceholders})`).bind(...ids).run();
+      try { await db.exec('COMMIT'); } catch (_) {}
+
+      const deleted = deleteResult?.meta?.changes || 0;
+      for (const row of rows) {
+        invalidateMailboxCache(row.address);
+      }
+      invalidateSystemStatCache('total_mailboxes');
+
+      return Response.json({ success: true, deleted });
+    } catch (e) {
+      try { await db.exec('ROLLBACK'); } catch (_) {}
+      return errorResponse('批量删除失败: ' + e.message, 500);
+    }
+  }
+
   // 批量切换邮箱登录权限
   if (path === '/api/mailboxes/batch-toggle-login' && request.method === 'POST') {
     if (isMock) return errorResponse('演示模式不可操作', 403);

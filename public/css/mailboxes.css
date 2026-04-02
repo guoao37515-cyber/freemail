@@ -992,3 +992,63 @@
   font-family: monospace;
   resize: vertical;
 }
+
+/* ===== 勾选复选框样式 ===== */
+.mailbox-checkbox-wrap {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mailbox-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #6366f1;
+}
+
+/* 列表视图复选框 */
+.mailbox-list-item .mailbox-checkbox-wrap {
+  position: static;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* 卡片被选中时高亮边框 */
+.mailbox-card:has(.mailbox-checkbox:checked) {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.25), 0 8px 32px rgba(99,102,241,0.15);
+}
+
+.mailbox-list-item:has(.mailbox-checkbox:checked) {
+  background: rgba(99,102,241,0.06);
+  border-color: rgba(99,102,241,0.3);
+}
+
+/* 全选区域样式 */
+.select-all-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary, #6b7280);
+  padding: 4px 8px;
+  border-radius: 6px;
+  user-select: none;
+}
+
+.select-all-wrap:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.select-all-wrap input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: #6366f1;
+}

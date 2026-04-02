@@ -602,3 +602,12 @@
   }
 }
 
+
+
+.btn-danger-ghost {
+  color: var(--danger, #ef4444);
+}
+.btn-danger-ghost:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger, #ef4444);
+}

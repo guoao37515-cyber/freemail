@@ -123,6 +123,19 @@
           <div class="toolbar-row-2">
             <div class="toolbar-spacer"></div>
             <div class="batch-actions">
+              <!-- 全选 + 批量删除（勾选后显示） -->
+              <label id="select-all-wrap" class="select-all-wrap" title="全选/取消全选">
+                <input type="checkbox" id="select-all-checkbox" />
+                <span id="select-all-label">全选</span>
+              </label>
+              <button id="batch-delete" class="btn btn-ghost btn-sm btn-danger-ghost" title="删除选中邮箱" aria-label="批量删除" style="display:none">
+                <span class="btn-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <use href="/icons/sprites.svg#icon-trash"/>
+                  </svg>
+                </span>
+                <span id="batch-delete-label">删除选中 (0)</span>
+              </button>
               <button id="batch-allow" class="btn btn-ghost btn-sm" title="批量放行邮箱登录" aria-label="批量放行">
                 <span class="btn-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

@@ -68,6 +68,9 @@ export function renderCard(m) {
 
   return `
     <div class="mailbox-card" data-address="${addr}" data-id="${m.id}" data-action="jump">
+      <label class="mailbox-checkbox-wrap" title="选择" onclick="event.stopPropagation()">
+        <input type="checkbox" class="mailbox-checkbox" data-address="${addr}" onclick="event.stopPropagation()" />
+      </label>
       ${m.is_pinned ? '<div class="pin-badge" title="置顶"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-pin"/></svg></div>' : ''}
       ${m.is_favorite ? '<div class="favorite-badge" title="收藏"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-star"/></svg></div>' : ''}
       ${forward ? `<div class="forward-badge" title="转发到: ${forward}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg></div>` : ''}
@@ -96,6 +99,9 @@ export function renderListItem(m) {
 
   return `
     <div class="mailbox-list-item" data-address="${addr}" data-id="${m.id}">
+      <label class="mailbox-checkbox-wrap" title="选择" onclick="event.stopPropagation()">
+        <input type="checkbox" class="mailbox-checkbox" data-address="${addr}" onclick="event.stopPropagation()" />
+      </label>
       <div class="pin-indicator">
         ${m.is_pinned ? '<span class="pin-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-pin"/></svg></span>' : '<span class="pin-placeholder"></span>'}
       </div>

@@ -37,6 +37,11 @@ const els = {
   batchUnfavorite: document.getElementById('batch-unfavorite'),
   batchForward: document.getElementById('batch-forward'),
   batchClearForward: document.getElementById('batch-clear-forward'),
+  // 勾选批量删除
+  selectAllCheckbox: document.getElementById('select-all-checkbox'),
+  selectAllLabel: document.getElementById('select-all-label'),
+  batchDelete: document.getElementById('batch-delete'),
+  batchDeleteLabel: document.getElementById('batch-delete-label'),
   // 批量操作模态框
   batchModal: document.getElementById('batch-login-modal'),
   batchModalClose: document.getElementById('batch-modal-close'),
@@ -67,6 +72,50 @@ let page = 1, PAGE_SIZE = 20, lastCount = 0, currentData = [];
 let currentView = localStorage.getItem('mf:mailboxes:view') || 'grid';
 let searchTimeout = null, isLoading = false;
 let availableDomains = [];
+
+// 勾选状态
+const selectedAddresses = new Set();
+
+function updateSelectionUI() {
+  const count = selectedAddresses.size;
+  // 更新删除按钮
+  if (els.batchDelete) {
+    els.batchDelete.style.display = count > 0 ? '' : 'none';
+  }
+  if (els.batchDeleteLabel) {
+    els.batchDeleteLabel.textContent = `删除选中 (${count})`;
+  }
+  // 同步全选框状态
+  if (els.selectAllCheckbox) {
+    const allAddresses = currentData.map(m => m.address);
+    const allChecked = allAddresses.length > 0 && allAddresses.every(a => selectedAddresses.has(a));
+    const someChecked = allAddresses.some(a => selectedAddresses.has(a));
+    els.selectAllCheckbox.checked = allChecked;
+    els.selectAllCheckbox.indeterminate = someChecked && !allChecked;
+    if (els.selectAllLabel) {
+      els.selectAllLabel.textContent = allChecked ? '取消全选' : '全选';
+    }
+  }
+  // 同步页面上复选框的勾选状态
+  els.grid?.querySelectorAll('.mailbox-checkbox').forEach(cb => {
+    cb.checked = selectedAddresses.has(cb.dataset.address);
+  });
+}
+
+function bindCheckboxEvents() {
+  els.grid?.querySelectorAll('.mailbox-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        selectedAddresses.add(cb.dataset.address);
+      } else {
+        selectedAddresses.delete(cb.dataset.address);
+      }
+      updateSelectionUI();
+    });
+    // 恢复勾选状态（翻页后重新渲染需要恢复）
+    cb.checked = selectedAddresses.has(cb.dataset.address);
+  });
+}
 
 // 加载邮箱列表
 async function load() {
@@ -101,6 +150,8 @@ async function load() {
     
     updatePager();
     bindCardEvents();
+    bindCheckboxEvents();
+    updateSelectionUI();
   } catch (e) {
     console.error('加载失败:', e);
     showToast('加载失败', 'error');
@@ -219,6 +270,8 @@ function switchView(view) {
   if (currentData.length) {
     els.grid.innerHTML = view === 'grid' ? renderGrid(currentData) : renderList(currentData);
     bindCardEvents();
+    bindCheckboxEvents();
+    updateSelectionUI();
   }
 }
 
@@ -429,10 +482,10 @@ async function executeBatchAction() {
 els.search?.addEventListener('click', () => { page = 1; load(); });
 els.q?.addEventListener('input', () => { if (searchTimeout) clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { page = 1; load(); }, 300); });
 els.q?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); page = 1; load(); }});
-els.prev?.addEventListener('click', () => { if (page > 1 && !isLoading) { page--; load(); }});
-els.next?.addEventListener('click', () => { 
+els.prev?.addEventListener('click', () => { if (page > 1 && !isLoading) { selectedAddresses.clear(); page--; load(); }});
+els.next?.addEventListener('click', () => {
   const totalPages = Math.max(1, Math.ceil(lastCount / PAGE_SIZE));
-  if (page < totalPages && !isLoading) { page++; load(); }
+  if (page < totalPages && !isLoading) { selectedAddresses.clear(); page++; load(); }
 });
 els.domainFilter?.addEventListener('change', () => { page = 1; load(); });
 els.loginFilter?.addEventListener('change', () => { page = 1; load(); });
@@ -449,6 +502,41 @@ els.batchFavorite?.addEventListener('click', () => openBatchModal('favorite', '�
 els.batchUnfavorite?.addEventListener('click', () => openBatchModal('unfavorite', '批量取消收藏', '☆', '输入要取消收藏的邮箱地址（每行一个或用逗号分隔）：'));
 els.batchForward?.addEventListener('click', () => openBatchModal('forward', '批量设置转发', '↪️', '输入要设置转发的邮箱地址（每行一个或用逗号分隔）：'));
 els.batchClearForward?.addEventListener('click', () => openBatchModal('clear-forward', '批量清除转发', '🚫', '输入要清除转发的邮箱地址（每行一个或用逗号分隔）：'));
+
+// 全选复选框
+els.selectAllCheckbox?.addEventListener('change', () => {
+  const allAddresses = currentData.map(m => m.address);
+  if (els.selectAllCheckbox.checked) {
+    allAddresses.forEach(a => selectedAddresses.add(a));
+  } else {
+    allAddresses.forEach(a => selectedAddresses.delete(a));
+  }
+  updateSelectionUI();
+});
+
+// 勾选批量删除
+els.batchDelete?.addEventListener('click', async () => {
+  const addresses = Array.from(selectedAddresses);
+  if (!addresses.length) return;
+  if (!confirm(`确定删除选中的 ${addresses.length} 个邮箱？此操作不可恢复！`)) return;
+  try {
+    const res = await fetch('/api/mailboxes/batch-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ addresses })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showToast(`已删除 ${data.deleted ?? addresses.length} 个邮箱`, 'success');
+      selectedAddresses.clear();
+      load();
+    } else {
+      showToast(data.error || '删除失败', 'error');
+    }
+  } catch (e) {
+    showToast('删除失败: ' + (e.message || '未知错误'), 'error');
+  }
+});
 
 // 批量操作模态框事件
 els.batchModalClose?.addEventListener('click', closeBatchModal);
