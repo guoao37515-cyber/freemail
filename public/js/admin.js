@@ -3,7 +3,7 @@
  * @module admin
  */
 
-import { api, getUsers, createUser, updateUser, deleteUser, getUserMailboxes, assignMailbox, unassignMailbox, getDomains, toggleDomain, reorderDomains } from './modules/admin/api.js';
+import { api, getUsers, createUser, updateUser, deleteUser, getUserMailboxes, assignMailbox, unassignMailbox, getDomains, toggleDomain, reorderDomains, clearAllMailboxes } from './modules/admin/api.js';
 import { formatTime, renderUserRow, renderUserList, generateSkeletonRows, renderPagination } from './modules/admin/user-list.js';
 import { fillEditForm, collectEditFormData, validateEditForm, resetEditState } from './modules/admin/user-edit.js';
 
@@ -152,18 +152,24 @@ async function loadUsers() {
 function updateStats(users) {
   const totalUsers = users.length;
   const adminCount = users.filter(u => u.role === 'admin').length;
-  const mailboxCount = users.reduce((sum, u) => sum + (u.mailbox_count || 0), 0);
   const activeUsers = users.filter(u => u.can_send).length;
 
   const statTotal = document.getElementById('stat-total-users');
   const statAdmin = document.getElementById('stat-admin-count');
-  const statMailbox = document.getElementById('stat-mailbox-count');
   const statActive = document.getElementById('stat-active-users');
 
   if (statTotal) statTotal.textContent = totalUsers;
   if (statAdmin) statAdmin.textContent = adminCount;
-  if (statMailbox) statMailbox.textContent = mailboxCount;
   if (statActive) statActive.textContent = activeUsers;
+
+  // 从 API 获取真实邮箱总数
+  const statMailbox = document.getElementById('stat-mailbox-count');
+  if (statMailbox) {
+    fetch('/api/user/quota')
+      .then(r => r.json())
+      .then(data => { statMailbox.textContent = data.used ?? 0; })
+      .catch(() => {});
+  }
 }
 
 // 更新分页
@@ -481,6 +487,22 @@ els.aOpen?.addEventListener('click', () => els.aModal?.classList.add('show'));
 els.aClose?.addEventListener('click', () => els.aModal?.classList.remove('show'));
 els.aCancel?.addEventListener('click', () => els.aModal?.classList.remove('show'));
 els.aAssign?.addEventListener('click', handleAssignMailbox);
+
+// 清空所有邮箱
+document.getElementById('clear-all-mailboxes')?.addEventListener('click', async () => {
+  const confirmed = await showConfirm('确定清空所有邮箱吗？此操作将删除全部邮箱及其邮件，不可恢复！');
+  if (!confirmed) return;
+  try {
+    const data = await clearAllMailboxes();
+    if (data.success) {
+      showToast(`已清空 ${data.deleted} 个邮箱`, 'success');
+    } else {
+      showToast(data.error || '清空失败', 'error');
+    }
+  } catch (e) {
+    showToast('清空失败', 'error');
+  }
+});
 
 // 取消分配模态框
 els.unassignOpen?.addEventListener('click', () => els.unassignModal?.classList.add('show'));

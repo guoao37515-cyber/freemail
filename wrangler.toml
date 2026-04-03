@@ -19,7 +19,7 @@ GUEST_PASSWORD="guestguest"
 JWT_TOKEN="zhang123456"
 JWT_TOKENGUEST_PASSWORD="zhang123456"
 SESSION_EXPIRE_DAYS="365"
-MAIL_DOMAIN="sunday9527.com,sunday9527.shop,sunday95289528.eu.cc,sunday9527.eu.cc,sunday9528.eu.cc"
+MAIL_DOMAIN="sunday9527.com,sunday9527.shop,sunday95289528.eu.cc,sunday9527.eu.cc,sunday9528.eu.cc,sunday95289528.ccwu.cc,sunday9527.ccwu.cc,sunday9528.ccwu.cc,sunday9527.us.ci,sunday9528.us.ci"
 RESEND_API_KEY=""
 
 

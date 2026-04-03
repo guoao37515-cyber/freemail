@@ -284,6 +284,18 @@
   color: #475569;
 }
 
+.action-btn-danger {
+  background: transparent;
+  color: #ef4444;
+  border: 1.5px solid #fecaca;
+}
+
+.action-btn-danger:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #dc2626;
+}
+
 /* ===========================================
    表格设计
    =========================================== */

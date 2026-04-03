@@ -10,6 +10,7 @@
 
 📖 **[一键部署指南](docs/yijianbushu.md)** | 📬 **[Resend 发件配置](docs/resend.md)** | 📚 **[API 文档](docs/api.md)**
 cd e:/workgit/Sunday/freemail && wrangler deploy 2>&1
+cd e:/workgit/Sunday/freemail && wrangler dev --local
 
 ## 📸 项目展示
 

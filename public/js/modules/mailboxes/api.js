@@ -146,6 +146,11 @@ export async function setFavorite(mailboxId, isFavorite) {
   });
 }
 
+export async function clearAllMailboxes() {
+  const r = await api('/api/mailboxes/clear-all', { method: 'DELETE' });
+  return r.json();
+}
+
 export default {
   api,
   loadMailboxes,
@@ -156,5 +161,6 @@ export default {
   toggleLogin,
   batchToggleLogin,
   setForward,
-  setFavorite
+  setFavorite,
+  clearAllMailboxes
 };

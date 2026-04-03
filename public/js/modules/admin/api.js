@@ -164,6 +164,15 @@ export async function reorderDomains(order) {
   }
 }
 
+/**
+ * 清空所有邮箱
+ * @returns {Promise<object>}
+ */
+export async function clearAllMailboxes() {
+  const r = await api('/api/mailboxes/clear-all', { method: 'DELETE' });
+  return r.json();
+}
+
 export default {
   api,
   getUsers,
@@ -175,5 +184,6 @@ export default {
   unassignMailbox,
   getDomains,
   toggleDomain,
-  reorderDomains
+  reorderDomains,
+  clearAllMailboxes
 };

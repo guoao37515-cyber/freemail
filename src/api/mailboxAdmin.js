@@ -177,6 +177,26 @@ export async function handleMailboxAdminApi(request, db, url, path, options) {
     }
   }
 
+  // 清空所有邮箱
+  if (path === '/api/mailboxes/clear-all' && request.method === 'DELETE') {
+    if (isMock) return errorResponse('演示模式不可删除', 403);
+    if (!isStrictAdmin(request, options)) return errorResponse('Forbidden', 403);
+    try {
+      try { await db.exec('BEGIN'); } catch (_) {}
+      await db.prepare('DELETE FROM messages').run();
+      const deleteResult = await db.prepare('DELETE FROM mailboxes').run();
+      try { await db.exec('COMMIT'); } catch (_) {}
+
+      const deleted = deleteResult?.meta?.changes || 0;
+      invalidateSystemStatCache('total_mailboxes');
+
+      return Response.json({ success: true, deleted });
+    } catch (e) {
+      try { await db.exec('ROLLBACK'); } catch (_) {}
+      return errorResponse('清空失败: ' + e.message, 500);
+    }
+  }
+
   // 批量切换邮箱登录权限
   if (path === '/api/mailboxes/batch-toggle-login' && request.method === 'POST') {
     if (isMock) return errorResponse('演示模式不可操作', 403);
