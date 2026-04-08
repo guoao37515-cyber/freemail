@@ -8,18 +8,18 @@ keep_vars=true
 [[d1_databases]]
 binding = "TEMP_MAIL_DB"
 database_name = "maill_free_db" #你的d1数据库名称
-database_id = "7f5b9cba-513f-4b7b-ae91-dbd741edfaad" # 你的database_id
+database_id = "5fa6cd1a-75a4-4e14-a013-cbc648ec5bd3" # 你的database_id
 # 登录会话过期时间（单位：天，默认7天）
 # 环境变量
 [vars]
 # FORWARD_RULES="[{"prefix":"vip","email":"a@example.com"},{"prefix":"*","email":"example@qq.com"}]"
 ADMIN_NAME="admin"
-ADMIN_PASSWORD="zhang123456"
-GUEST_PASSWORD="guestguest"
-JWT_TOKEN="zhang123456"
-JWT_TOKENGUEST_PASSWORD="zhang123456"
+ADMIN_PASSWORD="guo123654"
+GUEST_PASSWORD="123654"
+JWT_TOKEN="wdsj2693867207"
+JWT_TOKENGUEST_PASSWORD="guo123654"
 SESSION_EXPIRE_DAYS="365"
-MAIL_DOMAIN="sunday9527.com,sunday9527.shop,sunday95289528.eu.cc,sunday9527.eu.cc,sunday9528.eu.cc,sunday95289528.ccwu.cc,sunday9527.ccwu.cc,sunday9528.ccwu.cc,sunday9527.us.ci,sunday9528.us.ci"
+MAIL_DOMAIN="wuyouduanju.top"
 RESEND_API_KEY=""
 
 
