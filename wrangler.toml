@@ -13,7 +13,7 @@ database_id = "5fa6cd1a-75a4-4e14-a013-cbc648ec5bd3" # 你的database_id
 # 环境变量
 [vars]
 # FORWARD_RULES="[{"prefix":"vip","email":"a@example.com"},{"prefix":"*","email":"example@qq.com"}]"
-ADMIN_NAME="admin"
+ADMIN_NAME="2693867207"
 ADMIN_PASSWORD="guo123654"
 GUEST_PASSWORD="123654"
 JWT_TOKEN="wdsj2693867207"
